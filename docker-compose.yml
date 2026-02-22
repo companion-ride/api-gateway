@@ -1,0 +1,27 @@
+services:
+  consul:
+    image: hashicorp/consul:1.19
+    container_name: consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500"   # UI + HTTP API
+      - "8600:8600/udp"  # DNS
+    command: "agent -server -bootstrap-expect=1 -ui -client=0.0.0.0"
+    volumes:
+      - consul_data:/consul/data
+
+  gateway:
+    build: .
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-9090}:9090"
+    environment:
+      GATEWAY_PORT: ${GATEWAY_PORT:-9090}
+      CONSUL_ADDR: consul:8500
+      GATEWAY_SECRET: ${GATEWAY_SECRET}
+    depends_on:
+      - consul
+
+volumes:
+  consul_data:
