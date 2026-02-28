@@ -49,6 +49,7 @@ func (p *Proxy) forward(w http.ResponseWriter, r *http.Request, serviceName, pre
 
 	target, _ := url.Parse(fmt.Sprintf("http://%s:%d", addr, port))
 
+	originalHost := r.Host
 	proxy := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.URL.Scheme = target.Scheme
@@ -58,7 +59,10 @@ func (p *Proxy) forward(w http.ResponseWriter, r *http.Request, serviceName, pre
 			if req.URL.Path == "" {
 				req.URL.Path = "/"
 			}
-			req.Host = target.Host
+			// Keep the original host so downstream services build correct redirect URLs.
+			req.Host = originalHost
+			req.Header.Set("X-Forwarded-Host", originalHost)
+			req.Header.Set("X-Forwarded-Prefix", prefix)
 		},
 	}
 
