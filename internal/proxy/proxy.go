@@ -19,6 +19,7 @@ var Routes = map[string]string{
 	"/api/rides":      "rides-service",
 	"/api/pathfinder":  "pathfinder",
 	"/api/config":     "config-service",
+	"/api/chat":       "chat-service",
 }
 
 type Proxy struct {
