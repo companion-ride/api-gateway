@@ -9,6 +9,8 @@ RUN CGO_ENABLED=0 go build -o gateway ./cmd/gateway
 FROM alpine:3.20
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/gateway /gateway
+RUN adduser -D -u 10001 app
+USER app
 
 EXPOSE 9090
 ENTRYPOINT ["/gateway"]
